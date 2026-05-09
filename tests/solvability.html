@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishgranted · Solvability Check</title>
+<style>
+  body { font-family: -apple-system, system-ui, Segoe UI, Roboto, sans-serif; max-width: 960px; margin: 24px auto; padding: 0 20px 80px; color: #1A1410; background: #F4EBD9; }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .note { font-size: 12px; color: #5A4A3A; margin-bottom: 16px; }
+  .summary { padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-weight: 700; }
+  .summary.all-pass { background: #D4EFC8; color: #1A4D1A; border-left: 4px solid #2D7D2D; }
+  .summary.has-fail { background: #F5C6C6; color: #5A1A1A; border-left: 4px solid #8B1A1A; }
+  .row { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; margin: 8px 0; background: white; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .row .label { font-family: monospace; font-weight: 700; min-width: 80px; color: #5A0E0E; }
+  .row .stat { padding: 2px 8px; border-radius: 3px; font-family: monospace; font-size: 11px; flex-shrink: 0; }
+  .row .stat.ok { background: #D4EFC8; color: #1A4D1A; }
+  .row .stat.exit { background: #FFE9B0; color: #6B4A00; }
+  .row .stat.fail { background: #F5C6C6; color: #5A1A1A; }
+  .row .wish { flex: 1; font-family: monospace; font-size: 11px; color: #1A1410; word-break: break-word; }
+  .row .meta { font-family: monospace; font-size: 10px; color: #777; margin-top: 4px; }
+  .running { color: #777; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Wishgranted · Solvability Check</h1>
+<div class="note">For each level, attempts to find a wish satisfying every rule. Final Wish accepts the 23-of-24 contradiction-exit (only doubleLetter or only noDouble failing — the design's mutual-exclusion).</div>
+<div id="summary" class="summary running">Checking levels…</div>
+<div id="results"></div>
+
+<script src="../js/rules.js"></script>
+<script src="../js/levels.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var SEEDS = [
+    'Indeed Genie I wish for 1 thing',
+    'I wish for happy red book',
+    'I want my hand 1 2 Monday Smith',
+    'I see fine wine cat 1 9?',
+    'I want extraordinary 5 5 7 winter today fine',
+    'education in Japan north kayak bread',
+    'I play Nf3 4 apple banana cat with violin in May',
+    'Djinn 2 3 5 LX Au Mn Mg Mars',
+    '1 4 5 alpha open-mind',
+    'I want my gold iron 1 2 3 ring for hmm',
+    'Djinn happy 9 4 1 ? Mr Smith Pakistan Mongolia gold Au LX Nf3 May Friday skin anna kayak noon Mn',
+    'Oh great one I wish for 1 thing',
+    'Eat your apple banana cat with violin in May Mr',
+    'education in India east kayak rice food cake',
+    'Djinn 2 3 5 LX Au Mn Mg Pluto Saturn happy',
+    '11 13 17 alpha self-aware'
+  ];
+
+  var VOCAB = [
+    'Genie','Djinn','Master','genie','djinn','master',
+    'I','wish','for','one','two','three','five','seven','eight','nine','grant',
+    'happy','crappy','book','books','will','all','small','tall','call',
+    'kayak','noon','anna','level','civic','radar','redder',
+    'Mr','Mrs','Smith','Anna','James','Anne','Otto','Bob',
+    'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday',
+    'red','blue','green','gold','silver','black','white','pink','purple',
+    'Japan','India','China','France','Egypt','Italy','Spain','Pakistan','Mongolia','Brazil','Iraq','Iran','Cuba',
+    'hand','heart','eye','skin','knee','foot','head','back','lung','muscle',
+    'Nf3','Qa4','a4','e4','O-O','exd5','Bb5',
+    'C','D','M','LX','LXX','CL','CC','III','IV','MM','MD',
+    'He','Li','Be','Na','Mg','Al','Si','Cl','Ar','Ca','Fe','Cu','Zn','Au','Hg','Pb','Mn','Ti','Cr','Sc',
+    'May','today','tomorrow','please','prophecy','wonderful','beautiful','fantastic','enormous',
+    'is','was','at','the','of','my','our','give','take','grant',
+    '1','2','3','4','5','6','7','8','9','11','13','17','25','100','144',
+    '?','!','.', '"',
+    'fine','wine','line','time','rhyme','rhymes','dimes','dines'
+  ];
+
+  function ruleObjectsFor(ids) {
+    var pool = window.RULE_POOL;
+    var out = [];
+    for (var i = 0; i < ids.length; i++) {
+      for (var j = 0; j < pool.length; j++) {
+        if (pool[j].id === ids[i]) { out.push(pool[j]); break; }
+      }
+    }
+    return out;
+  }
+
+  function passesAll(rules, wish) {
+    for (var i = 0; i < rules.length; i++) {
+      if (!rules[i].check(wish)) return false;
+    }
+    return true;
+  }
+
+  function failingIds(rules, wish) {
+    var out = [];
+    for (var i = 0; i < rules.length; i++) {
+      if (!rules[i].check(wish)) out.push(rules[i].id);
+    }
+    return out;
+  }
+
+  function isContradictionExit(failed) {
+    if (failed.length !== 1) return false;
+    return failed[0] === 'doubleLetter' || failed[0] === 'noDouble';
+  }
+
+  function randInt(n) { return Math.floor(Math.random() * n); }
+
+  function mutate(wish) {
+    var ws = wish.split(/\s+/).filter(function (s) { return s.length > 0; });
+    var op = randInt(5);
+    if (op === 0 || ws.length === 0) {
+      ws.push(VOCAB[randInt(VOCAB.length)]);
+    } else if (op === 1 && ws.length > 1) {
+      ws.splice(randInt(ws.length), 1);
+    } else if (op === 2) {
+      ws[randInt(ws.length)] = VOCAB[randInt(VOCAB.length)];
+    } else if (op === 3) {
+      ws.splice(randInt(ws.length + 1), 0, VOCAB[randInt(VOCAB.length)]);
+    } else {
+      var i = randInt(ws.length);
+      var j = randInt(ws.length);
+      var tmp = ws[i]; ws[i] = ws[j]; ws[j] = tmp;
+    }
+    return ws.join(' ');
+  }
+
+  function tryFuzz(rules, isFinal, deadlineMs) {
+    var bestWish = '';
+    var bestScore = -1;
+    for (var s = 0; s < SEEDS.length; s++) {
+      var wish = SEEDS[s];
+      if (isFinal) {
+        var failed = failingIds(rules, wish);
+        if (failed.length === 0) return { ok: true, wish: wish, exit: false, iters: 0 };
+        if (isContradictionExit(failed)) return { ok: true, wish: wish, exit: true, iters: 0, only: failed[0] };
+      } else {
+        if (passesAll(rules, wish)) return { ok: true, wish: wish, iters: 0 };
+      }
+      var passCount = 0;
+      for (var k = 0; k < rules.length; k++) if (rules[k].check(wish)) passCount++;
+      if (passCount > bestScore) { bestScore = passCount; bestWish = wish; }
+    }
+
+    var iters = 0;
+    var current = bestWish;
+    var currentScore = bestScore;
+    var maxIters = 100000;
+    while (iters < maxIters && Date.now() < deadlineMs) {
+      iters++;
+      var candidate = mutate(current);
+      if (candidate.length > 200) continue;
+      if (isFinal) {
+        var failed2 = failingIds(rules, candidate);
+        if (failed2.length === 0) return { ok: true, wish: candidate, exit: false, iters: iters };
+        if (isContradictionExit(failed2)) return { ok: true, wish: candidate, exit: true, iters: iters, only: failed2[0] };
+      } else {
+        if (passesAll(rules, candidate)) return { ok: true, wish: candidate, iters: iters };
+      }
+      var score = 0;
+      for (var k2 = 0; k2 < rules.length; k2++) if (rules[k2].check(candidate)) score++;
+      if (score > currentScore || (score === currentScore && Math.random() < 0.05)) {
+        current = candidate;
+        currentScore = score;
+        if (score > bestScore) { bestScore = score; bestWish = candidate; }
+      }
+    }
+    return { ok: false, wish: bestWish, score: bestScore, total: rules.length, iters: iters };
+  }
+
+  function render(rows, allOk) {
+    var summaryEl = document.getElementById('summary');
+    var resultsEl = document.getElementById('results');
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var statClass = r.exit ? 'exit' : (r.ok ? 'ok' : 'fail');
+      var statText = r.exit ? 'EXIT 23/24' : (r.ok ? 'PASS' : 'FAIL');
+      html += '<div class="row">' +
+        '<div class="label">' + r.label + '</div>' +
+        '<div style="flex:1; min-width: 0;">' +
+          '<div class="wish">' + escapeHtml(r.wish || '(no candidate)') + '</div>' +
+          '<div class="meta">' +
+            (r.iters !== undefined ? r.iters + ' iter · ' : '') +
+            (r.only ? 'only ' + r.only + ' failing · ' : '') +
+            (typeof r.score === 'number' ? 'best ' + r.score + '/' + r.total : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="stat ' + statClass + '">' + statText + '</div>' +
+      '</div>';
+    }
+    resultsEl.innerHTML = html;
+    summaryEl.className = 'summary ' + (allOk ? 'all-pass' : 'has-fail');
+    summaryEl.textContent = (allOk ? '✓ ' : '✗ ') + rows.filter(function (r) { return r.ok; }).length + ' / ' + rows.length + ' levels solvable';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  function run() {
+    var rows = [];
+    var allOk = true;
+    var perLevelMs = 5000;
+
+    for (var n = 1; n <= 10; n++) {
+      var lvl = window.getLevel(n);
+      var rules = lvl.rules;
+      var deadline = Date.now() + perLevelMs;
+      var res = tryFuzz(rules, false, deadline);
+      rows.push({
+        label: 'Level ' + n,
+        ok: res.ok,
+        wish: res.wish,
+        iters: res.iters,
+        score: res.ok ? undefined : res.score,
+        total: res.ok ? undefined : res.total
+      });
+      if (!res.ok) allOk = false;
+    }
+
+    var finalRules = window.getFinalRules();
+    var finalDeadline = Date.now() + perLevelMs * 2;
+    var finalRes = tryFuzz(finalRules, true, finalDeadline);
+    rows.push({
+      label: 'Final Wish',
+      ok: finalRes.ok,
+      exit: finalRes.exit,
+      only: finalRes.only,
+      wish: finalRes.wish,
+      iters: finalRes.iters,
+      score: finalRes.ok ? undefined : finalRes.score,
+      total: finalRes.ok ? undefined : finalRes.total
+    });
+    if (!finalRes.ok) allOk = false;
+
+    render(rows, allOk);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
+</script>
+
+</body>
+</html>

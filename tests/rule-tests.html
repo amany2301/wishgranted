@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishgranted · Rule Tests</title>
+<style>
+  body { font-family: -apple-system, system-ui, Segoe UI, Roboto, sans-serif; max-width: 960px; margin: 24px auto; padding: 0 20px 80px; color: #1A1410; background: #F4EBD9; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .summary { padding: 12px 16px; margin: 16px 0; border-radius: 4px; font-weight: 700; }
+  .summary.all-pass { background: #D4EFC8; color: #1A4D1A; border-left: 4px solid #2D7D2D; }
+  .summary.has-fail { background: #F5C6C6; color: #5A1A1A; border-left: 4px solid #8B1A1A; }
+  .rule-block { margin: 18px 0; padding: 12px 14px; background: white; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .rule-head { font-weight: 700; font-size: 14px; margin-bottom: 6px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .rule-id { font-family: monospace; color: #5A0E0E; }
+  .rule-text { font-size: 12px; color: #4A3F35; font-weight: 400; flex: 1; }
+  .rule-stat { font-family: monospace; font-size: 12px; padding: 2px 8px; border-radius: 3px; flex-shrink: 0; }
+  .rule-stat.ok { background: #D4EFC8; color: #1A4D1A; }
+  .rule-stat.fail { background: #F5C6C6; color: #5A1A1A; }
+  .case { padding: 4px 8px; margin: 2px 0; font-family: monospace; font-size: 11px; border-radius: 3px; word-break: break-word; }
+  .case.pass { background: #E8F5E0; color: #1A4D1A; }
+  .case.fail { background: #FBDADA; color: #5A1A1A; }
+  .case .label { font-weight: 700; margin-right: 6px; }
+  .case .expected { color: #555; font-size: 10px; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<h1>Wishgranted · Rule Tests</h1>
+<div id="summary" class="summary">Running…</div>
+<div id="results"></div>
+
+<script src="../js/rules.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var currentMonth = new Date().toLocaleDateString('en-US', { month: 'long' });
+
+  var TESTS = {
+    len12: {
+      pass: ['I wish for one thing', 'twelve charsx', 'abcdefghijkl'],
+      fail: ['short', 'eleven char', '']
+    },
+    len30: {
+      pass: ['this wish is at least thirty chars long', 'I want a long and detailed wish please today', '------------------------------'],
+      fail: ['short wish', 'twenty-nine characters here!', '']
+    },
+    maxLen60: {
+      pass: ['', 'short', 'this is exactly sixty characters long? maybe close enough.'],
+      fail: [
+        'this wish is way more than sixty characters long, definitely too long for the genie',
+        'a'.repeat(61),
+        'I would like to wish for many wonderful things to happen today and tomorrow'
+      ]
+    },
+    digit: {
+      pass: ['I want 1 thing', 'give me 5 wishes', 'in 2026 please'],
+      fail: ['no digits here', 'pure letters', 'wish please']
+    },
+    twoDigits: {
+      pass: ['1 and 2', 'I want 5 of 7 things', 'in 2026'],
+      fail: ['1 1 1 1', '5 5 5', 'no digits at all']
+    },
+    address: {
+      pass: ['Genie I wish', 'Djinn please', 'oh great one'],
+      fail: ['I wish for stuff', 'please grant me', 'just a wish']
+    },
+    doubleLetter: {
+      pass: ['book', 'happy days', 'will it work'],
+      fail: ['wish for me', 'no double here', 'abc def']
+    },
+    noVowelEnd: {
+      pass: ['I wish for things', 'good night moon', 'genie grant'],
+      fail: ['I wish for me', 'I love banana', 'I love you']
+    },
+    questionMark: {
+      pass: ['Why?', 'Is this real?', 'wish?'],
+      fail: ['no question', 'period.', 'exclaim!']
+    },
+    capital: {
+      pass: ['I love New York City', 'Once upon a Time in Hollywood', 'small Big Big things'],
+      fail: ['no caps here', 'I love new york', 'Just one Capital']
+    },
+    rhyme: {
+      pass: ['happy crappy day', 'fine wine glasses', 'sticks bricks'],
+      fail: ['no rhyme here', 'word phrase line', 'abc def ghi']
+    },
+    sum17: {
+      pass: ['8 9 stuff', '9 4 4 here', 'wish 9 8 done'],
+      fail: ['1 2 3', '100 wish', 'no digits']
+    },
+    palindrome: {
+      pass: ['I have a kayak', 'at noon today', 'level up'],
+      fail: ['no palindromes', 'river runs', 'just words']
+    },
+    color: {
+      pass: ['red sky', 'a blue moon', 'gold ring'],
+      fail: ['no colors', 'just words', 'wish please']
+    },
+    weekday: {
+      pass: ['Monday morning', 'by Friday', 'Sunday brunch'],
+      fail: ['no day', 'just words', 'wish please']
+    },
+    country: {
+      pass: ['in France today', 'from Japan with love', 'to India and back'],
+      fail: ['no country', 'just words', 'wish please']
+    },
+    bodyPart: {
+      pass: ['my heart', 'her hand', 'the eye'],
+      fail: ['no body', 'just words', 'wish please']
+    },
+    chess: {
+      pass: ['I play Nf3 today', 'O-O is castling', 'try Qxd5'],
+      fail: ['no chess move', 'Nf9 invalid', 'just words']
+    },
+    roman: {
+      pass: ['LX years', 'C cents', 'M years passed'],
+      fail: ['L only', 'no roman', 'IIII invalid']
+    },
+    noE: {
+      pass: ['djinn no fish at all', 'no four', 'kayak passing'],
+      fail: ['genie wishes', 'the letter e', 'ELEMENT']
+    },
+    noVowels: {
+      pass: ['it sounds like hmm', 'I hear pst', 'final word tsk'],
+      fail: ['I love today', 'wish please me', 'wish for love']
+    },
+    element: {
+      pass: ['Au is gold', 'I see He today', 'a Fe wish'],
+      fail: ['no element', 'just words', 'wish please']
+    },
+    prime: {
+      pass: ['2 things', 'I want 7', 'in 11 days'],
+      fail: ['1 thing', '4 6 8 only', 'no primes 100']
+    },
+    perfectSquare: {
+      pass: ['4 books', '16 things', '100 reasons'],
+      fail: ['1 thing', '5 things', 'no square 7']
+    },
+    startWith: {
+      pass: ['I wish for one', 'Eat now please', 'Apple pie today'],
+      fail: ['Banana wish', 'Sky falls down', 'wish please']
+    },
+    noDouble: {
+      pass: ['kayak today', 'I wish for thingz', 'one for me'],
+      fail: ['book', 'happy days', 'small wish']
+    },
+    longestWord: {
+      pass: ['I want incredible things', 'extraordinary day today', 'a beautiful adventure here'],
+      fail: ['short words only', 'abc def ghi', 'I wish for me']
+    },
+    fiveWords: {
+      pass: ['I wish for one thing', 'Genie grants my wish today', 'one two three four five'],
+      fail: ['I wish', 'I wish for many many things today', 'one two three four']
+    },
+    currentMonth: {
+      pass: ['I wish in ' + currentMonth, currentMonth + ' please', 'today is ' + currentMonth + ' 2026'],
+      fail: ['no month here', 'just words', 'wish please']
+    },
+    noQuestion: {
+      pass: ['no question here', 'wish for it', 'simple statement'],
+      fail: ['why?', 'is it?', 'will it work?']
+    },
+    threePrimes: {
+      pass: ['I have 2 3 5', '11 13 17 things', 'primes 7 11 13'],
+      fail: ['I have 1 4 6', 'no primes here', '2 only']
+    },
+    mathChain: {
+      pass: ['3 4 7', '5 8 13', 'I want 1 1 2 things'],
+      fail: ['1 2 4', 'no chain here', '5 5 5']
+    },
+    vowelHeavy: {
+      pass: ['I want education', 'she has sequoia tree', 'facetious wish'],
+      fail: ['I have a fox', 'no all vowels here', 'abc def']
+    },
+    alphaOrder: {
+      pass: ['I have apple banana cat', 'find blue green hat', 'alpha beta gamma'],
+      fail: ['I have cat banana apple', 'no order here', 'abc def']
+    },
+    animal: {
+      pass: ['I see a cat', 'wolf howls', 'tiny bee'],
+      fail: ['no animals', 'just words', 'plain wish']
+    },
+    food: {
+      pass: ['fresh bread', 'apple pie', 'wine night'],
+      fail: ['no food here', 'just words', 'plain wish']
+    },
+    season: {
+      pass: ['in winter', 'spring break', 'fall leaves'],
+      fail: ['no season', 'just words', 'plain wish']
+    },
+    direction: {
+      pass: ['go north', 'east wind', 'west coast'],
+      fail: ['no direction', 'just words', 'plain wish']
+    },
+    metal: {
+      pass: ['gold ring', 'iron fist', 'silver coin'],
+      fail: ['no metal here', 'just words', 'plain wish']
+    },
+    instrument: {
+      pass: ['play piano', 'guitar solo', 'violin string'],
+      fail: ['no instrument', 'just words', 'plain wish']
+    },
+    planet: {
+      pass: ['on Mars', 'Saturn ring', 'visit Pluto'],
+      fail: ['no planet', 'just words', 'plain wish']
+    },
+    greekLetter: {
+      pass: ['alpha male', 'sigma rule', 'pi day'],
+      fail: ['no greek', 'just words', 'plain wish']
+    },
+    pronoun: {
+      pass: ['I want', 'you know', 'we are here'],
+      fail: ['the cat sat', 'just words there', 'plain wish here']
+    },
+    alliteration: {
+      pass: ['big brown bear', 'silly silver snake', 'cat can come'],
+      fail: ['mixed words here', 'no alliteration found', 'abc def ghi']
+    },
+    ascendingLength: {
+      pass: ['I am big', 'a we cat', 'on big bird'],
+      fail: ['big big big', 'cat dog ox', 'word same same']
+    },
+    sumDigit10: {
+      pass: ['1 9 things', 'I want 4 6', '2 3 5 wish'],
+      fail: ['1 2 3', '17 only', 'no digits']
+    },
+    evenLength: {
+      pass: ['four', 'twelve chars', 'ab'],
+      fail: ['abcde', 'a', 'abc']
+    },
+    tenWords: {
+      pass: ['one two three four five six seven eight nine ten', 'I wish for one two three four five six seven', 'a b c d e f g h i j k l'],
+      fail: ['too short', 'one two three', 'short wish here']
+    },
+    hyphen: {
+      pass: ['well-being is key', 'open-mind', 'self-love wish'],
+      fail: ['no hyphens', 'just words', 'plain text']
+    },
+    tripleDigit: {
+      pass: ['1 2 3', '5 7 9 things', 'I have 4 5 6'],
+      fail: ['1 1 1', '2 2', 'no digits']
+    }
+  };
+
+  function run() {
+    var pool = window.RULE_POOL;
+    var resultsEl = document.getElementById('results');
+    var summaryEl = document.getElementById('summary');
+    var totalCases = 0;
+    var failedCases = 0;
+    var html = '';
+
+    for (var i = 0; i < pool.length; i++) {
+      var rule = pool[i];
+      var spec = TESTS[rule.id];
+      if (!spec) {
+        html += '<div class="rule-block"><div class="rule-head"><span><span class="rule-id">' + rule.id + '</span></span><span class="rule-stat fail">NO TESTS</span></div></div>';
+        failedCases++;
+        totalCases++;
+        continue;
+      }
+
+      var passResults = [];
+      var failResults = [];
+
+      for (var p = 0; p < spec.pass.length; p++) {
+        totalCases++;
+        var got = rule.check(spec.pass[p]);
+        if (!got) failedCases++;
+        passResults.push({ wish: spec.pass[p], got: got, expected: true });
+      }
+      for (var f = 0; f < spec.fail.length; f++) {
+        totalCases++;
+        var got2 = rule.check(spec.fail[f]);
+        if (got2) failedCases++;
+        failResults.push({ wish: spec.fail[f], got: got2, expected: false });
+      }
+
+      var allOk = true;
+      for (var k = 0; k < passResults.length; k++) if (!passResults[k].got) { allOk = false; break; }
+      if (allOk) for (var k2 = 0; k2 < failResults.length; k2++) if (failResults[k2].got) { allOk = false; break; }
+
+      var caseHtml = '';
+      for (var pr = 0; pr < passResults.length; pr++) {
+        var r = passResults[pr];
+        var ok = r.got === r.expected;
+        caseHtml += '<div class="case ' + (ok ? 'pass' : 'fail') + '"><span class="label">' + (ok ? 'PASS' : 'FAIL') + '</span>' + escapeHtml(JSON.stringify(r.wish)) + '<span class="expected">expected: pass</span></div>';
+      }
+      for (var fr = 0; fr < failResults.length; fr++) {
+        var r2 = failResults[fr];
+        var ok2 = r2.got === r2.expected;
+        caseHtml += '<div class="case ' + (ok2 ? 'pass' : 'fail') + '"><span class="label">' + (ok2 ? 'PASS' : 'FAIL') + '</span>' + escapeHtml(JSON.stringify(r2.wish)) + '<span class="expected">expected: fail</span></div>';
+      }
+
+      html += '<div class="rule-block">' +
+        '<div class="rule-head">' +
+          '<span><span class="rule-id">' + escapeHtml(rule.id) + '</span> <span class="rule-text">' + escapeHtml(rule.text) + '</span></span>' +
+          '<span class="rule-stat ' + (allOk ? 'ok' : 'fail') + '">' + (allOk ? 'OK' : 'FAIL') + '</span>' +
+        '</div>' +
+        caseHtml +
+      '</div>';
+    }
+
+    resultsEl.innerHTML = html;
+    summaryEl.className = 'summary ' + (failedCases === 0 ? 'all-pass' : 'has-fail');
+    summaryEl.textContent = (failedCases === 0 ? '✓ ' : '✗ ') +
+      (totalCases - failedCases) + ' / ' + totalCases + ' assertions passed across ' + pool.length + ' rules' +
+      (failedCases > 0 ? ' (' + failedCases + ' failures)' : '');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -515,6 +515,8 @@
   }
 
   function initClassicMode() {
+    window.UI.hideLanding();
+    window.UI.setModePill('classic');
     if (window.State.isClassicCompleted()) {
       showClassicEnding();
       return;
@@ -526,6 +528,7 @@
 
   function initQuickMode() {
     window.UI.hideLanding();
+    window.UI.setModePill('quick');
     if (window.State.isFinalComplete()) {
       showFinalEnding();
     } else if (window.State.getCompletedLevels().indexOf(10) !== -1) {
@@ -535,6 +538,12 @@
     } else {
       startLevel(window.State.getCurrentLevel());
     }
+  }
+
+  function onSwitchMode() {
+    if (!window.confirm('Return to the landing screen? Your current progress is kept — you can resume by picking the same mode again.')) return;
+    window.UI.closeSettingsMenu();
+    window.UI.showLanding({});
   }
 
   function init() {
@@ -591,6 +600,38 @@
       window.State.setPersonalAnswer(ruleId, t.value);
       if (window.State.getMode() === 'classic') evaluateClassic();
       else evaluateAndRender(false);
+    });
+
+    var settingsBtn = document.getElementById('settings-btn');
+    var settingsMenu = document.getElementById('settings-menu');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        window.UI.toggleSettingsMenu();
+      });
+    }
+    if (settingsMenu) {
+      settingsMenu.addEventListener('click', function (e) {
+        var t = e.target;
+        while (t && t !== settingsMenu && !t.classList.contains('settings-item')) t = t.parentNode;
+        if (!t || t === settingsMenu) return;
+        var action = t.getAttribute('data-action');
+        if (action === 'switch-mode') onSwitchMode();
+        else if (action === 'reset') {
+          window.UI.closeSettingsMenu();
+          onReset();
+        }
+      });
+    }
+    document.addEventListener('click', function (e) {
+      if (!settingsMenu || settingsMenu.style.display !== 'block') return;
+      var t = e.target;
+      if (settingsBtn && (t === settingsBtn || settingsBtn.contains(t))) return;
+      if (settingsMenu.contains(t)) return;
+      window.UI.closeSettingsMenu();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') window.UI.closeSettingsMenu();
     });
 
     var landingEl = document.getElementById('landing');

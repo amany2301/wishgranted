@@ -28,7 +28,44 @@
     els.topbar = $('topbar');
     els.header = document.querySelector('.header');
     els.footer = document.querySelector('.footer');
+    els.modePill = $('mode-pill');
+    els.settingsBtn = $('settings-btn');
+    els.settingsMenu = $('settings-menu');
     els.bound = true;
+  }
+
+  function setModePill(mode) {
+    bindEls();
+    if (!els.modePill) return;
+    if (mode === 'classic' || mode === 'quick') {
+      els.modePill.textContent = mode.toUpperCase();
+      els.modePill.style.display = 'inline-block';
+    } else {
+      els.modePill.style.display = 'none';
+    }
+  }
+
+  function setSettingsVisible(visible) {
+    bindEls();
+    if (els.settingsBtn) els.settingsBtn.style.display = visible ? 'inline-block' : 'none';
+    if (!visible && els.settingsMenu) {
+      els.settingsMenu.style.display = 'none';
+      if (els.settingsBtn) els.settingsBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function toggleSettingsMenu() {
+    bindEls();
+    if (!els.settingsMenu || !els.settingsBtn) return;
+    var open = els.settingsMenu.style.display === 'block';
+    els.settingsMenu.style.display = open ? 'none' : 'block';
+    els.settingsBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+  }
+
+  function closeSettingsMenu() {
+    bindEls();
+    if (els.settingsMenu) els.settingsMenu.style.display = 'none';
+    if (els.settingsBtn) els.settingsBtn.setAttribute('aria-expanded', 'false');
   }
 
   function showLanding(opts) {
@@ -40,6 +77,8 @@
     if (els.header) els.header.style.display = 'none';
     if (els.footer) els.footer.style.display = 'none';
     if (els.landing) els.landing.style.display = 'block';
+    setSettingsVisible(false);
+    setModePill(null);
 
     var cont = els.landingContinue;
     if (cont) {
@@ -59,6 +98,7 @@
     if (els.topbar) els.topbar.style.display = 'flex';
     if (els.header) els.header.style.display = 'block';
     if (els.footer) els.footer.style.display = 'block';
+    setSettingsVisible(true);
   }
 
   function showClassicShareCard(opts) {
@@ -464,6 +504,10 @@
     showLanding: showLanding,
     hideLanding: hideLanding,
     showClassicShareCard: showClassicShareCard,
+    setModePill: setModePill,
+    setSettingsVisible: setSettingsVisible,
+    toggleSettingsMenu: toggleSettingsMenu,
+    closeSettingsMenu: closeSettingsMenu,
     formatTime: formatTime
   };
 })();

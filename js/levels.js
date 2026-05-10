@@ -63,8 +63,45 @@
     return rules;
   }
 
+  // Classic Mode: ONE growing wish across 10 levels. Each level adds rules,
+  // none are removed. Curated subset of the 56-rule pool with zero internal
+  // contradictions — every rule here is compatible with every other rule here.
+  var CLASSIC_LEVELS = [
+    { num: 1,  name: 'INVOCATION',  added: ['address', 'digit'] },
+    { num: 2,  name: 'FOUNDATIONS', added: ['len12', 'color', 'doubleLetter'] },
+    { num: 3,  name: 'DETAILS',     added: ['weekday', 'bodyPart', 'capital'] },
+    { num: 4,  name: 'DESIRES',     added: ['animal', 'exLastName', 'questionMark'] },
+    { num: 5,  name: 'LONGER',      added: ['len30', 'crushFirstName', 'season', 'prime'] },
+    { num: 6,  name: 'MEMORIES',    added: ['country', 'food', 'palindrome', 'googled2am'] },
+    { num: 7,  name: 'RITUAL',      added: ['instrument', 'perfectSquare', 'pickupLine'] },
+    { num: 8,  name: 'PARADOX',     added: ['planet', 'roman', 'element', 'alliteration'] },
+    { num: 9,  name: 'FINALE',      added: ['sum17', 'hyphen', 'noVowelEnd'] },
+    { num: 10, name: 'THE WISH',    added: ['metal'] }
+  ];
+
+  function getClassicLevel(num) {
+    if (num < 1 || num > 10) return null;
+    return CLASSIC_LEVELS[num - 1];
+  }
+
+  function getClassicActiveRules(throughLevel) {
+    var rules = [];
+    var capped = Math.max(0, Math.min(10, throughLevel));
+    for (var i = 0; i < capped; i++) {
+      var added = CLASSIC_LEVELS[i].added;
+      for (var j = 0; j < added.length; j++) {
+        var r = resolveRule(added[j]);
+        if (r) rules.push(r);
+      }
+    }
+    return rules;
+  }
+
   window.LEVELS = Object.freeze(LEVELS.map(function (l) { return Object.freeze(l); }));
   window.FINAL_WISH = Object.freeze(FINAL_WISH);
   window.getLevel = getLevel;
   window.getFinalRules = getFinalRules;
+  window.CLASSIC_LEVELS = Object.freeze(CLASSIC_LEVELS.map(function (l) { return Object.freeze(l); }));
+  window.getClassicLevel = getClassicLevel;
+  window.getClassicActiveRules = getClassicActiveRules;
 })();

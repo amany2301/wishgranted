@@ -383,7 +383,158 @@
   function onInput() {
     sessionKeystrokes++;
     window.State.incrementKeystrokes();
-    evaluateAndRender(false);
+    if (window.State.getMode() === 'classic') {
+      evaluateClassic();
+    } else {
+      evaluateAndRender(false);
+    }
+  }
+
+  /* ─── Classic Mode ─────────────────────────────────────────────── */
+
+  var classicLevelNum = 1;
+
+  function evaluateClassic() {
+    var rules = window.getClassicActiveRules(classicLevelNum);
+    var wish = window.UI.getWishValue();
+    var personalAnswers = window.State.getPersonalAnswers();
+    var passedCount = 0;
+    for (var i = 0; i < rules.length; i++) {
+      var r = rules[i];
+      var ctx = r.isPersonal ? { personalAnswer: personalAnswers[r.id] || '' } : undefined;
+      if (r.check(wish, ctx)) passedCount++;
+    }
+
+    var revealed = window.State.getRevealedHints();
+    window.UI.renderRules(rules, wish, [], revealed, personalAnswers);
+    window.UI.setMeta({
+      chars: wish.length,
+      passed: passedCount,
+      failed: rules.length - passedCount,
+      hintsLeft: window.State.getHintsRemaining(),
+      hintBudget: window.State.HINT_BUDGET
+    });
+    window.UI.renderTopbar({
+      mode: 'classic',
+      levelNum: classicLevelNum,
+      completedCount: classicLevelNum - 1
+    });
+
+    var allPassed = passedCount === rules.length && rules.length > 0;
+    if (allPassed) {
+      var label;
+      if (classicLevelNum < 10) {
+        var nextLvl = window.getClassicLevel(classicLevelNum + 1);
+        label = 'Continue → ' + nextLvl.name;
+      } else {
+        label = 'Grant the wish';
+      }
+      window.UI.setGrantButton({ disabled: false, text: label });
+    } else {
+      var unmet = rules.length - passedCount;
+      window.UI.setGrantButton({
+        disabled: true,
+        text: unmet + ' condition' + (unmet === 1 ? '' : 's') + ' unmet'
+      });
+    }
+
+    window.State.setClassicWish(wish);
+  }
+
+  function startClassicLevel(num) {
+    classicLevelNum = Math.max(1, Math.min(10, num));
+    window.State.setClassicLevelNum(classicLevelNum);
+
+    window.UI.hideLanding();
+    window.UI.setMode('level');
+    window.UI.setRulesSectionLabel('Conditions');
+    var lvlMeta = window.getClassicLevel(classicLevelNum);
+    window.UI.setSubtitle('Classic · Level ' + classicLevelNum + ' · ' + lvlMeta.name);
+    window.UI.setWishPlaceholder('I wish for...');
+    window.UI.clearGenieLine();
+
+    var wish = window.State.getClassicWish() || '';
+    window.UI.setWishValue(wish);
+    window.UI.focusWish();
+    evaluateClassic();
+  }
+
+  function classicAdvance() {
+    if (classicLevelNum < 10) {
+      classicLevelNum++;
+      window.State.setClassicLevelNum(classicLevelNum);
+      var lvlMeta = window.getClassicLevel(classicLevelNum);
+      window.UI.setSubtitle('Classic · Level ' + classicLevelNum + ' · ' + lvlMeta.name);
+      window.UI.showGenieLine('The genie nods. Continue.');
+      evaluateClassic();
+    } else {
+      window.State.markClassicComplete();
+      showClassicEnding();
+    }
+  }
+
+  function classicShareText(wish) {
+    return '🧞 My wish was granted on Wishgranted.\n\n' +
+      '"' + wish + '"\n\n' +
+      '10 levels. 30 rules. One sentence.\n' +
+      'wishgranted.vizleo.com';
+  }
+
+  function showClassicEnding() {
+    var wish = window.State.getClassicWish();
+    var ruleCount = window.getClassicActiveRules(10).length;
+    window.UI.showClassicShareCard({
+      wish: wish,
+      ruleCount: ruleCount,
+      onCopy: function () {
+        var text = classicShareText(wish);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(
+            function () { window.UI.showToast('Copied to clipboard'); },
+            function () { window.UI.showToast('Copy failed'); }
+          );
+        }
+      },
+      onShare: function () {
+        var text = classicShareText(wish);
+        if (navigator.share) {
+          navigator.share({ text: text }).catch(function () {});
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            window.UI.showToast('Copied to clipboard');
+          });
+        }
+      },
+      onReset: function () {
+        if (window.confirm('Wipe your wish and play again?')) {
+          window.State.resetClassic();
+          startClassicLevel(1);
+        }
+      }
+    });
+  }
+
+  function initClassicMode() {
+    if (window.State.isClassicCompleted()) {
+      showClassicEnding();
+      return;
+    }
+    startClassicLevel(window.State.getClassicLevelNum());
+  }
+
+  /* ─── Quick Mode init (existing flow) ──────────────────────────── */
+
+  function initQuickMode() {
+    window.UI.hideLanding();
+    if (window.State.isFinalComplete()) {
+      showFinalEnding();
+    } else if (window.State.getCompletedLevels().indexOf(10) !== -1) {
+      var ip = window.State.getInProgress();
+      if (ip && ip.level === 'final') startFinalWish();
+      else showFinalIntro();
+    } else {
+      startLevel(window.State.getCurrentLevel());
+    }
   }
 
   function init() {
@@ -403,7 +554,8 @@
     if (wishEl) wishEl.addEventListener('input', onInput);
     if (grantBtn) grantBtn.addEventListener('click', function () {
       if (grantBtn.disabled) return;
-      onSubmit();
+      if (window.State.getMode() === 'classic') classicAdvance();
+      else onSubmit();
     });
     if (titleEl) {
       var titleClicks = [];
@@ -428,7 +580,8 @@
         window.UI.showToast('No hints left');
         return;
       }
-      evaluateAndRender(false);
+      if (window.State.getMode() === 'classic') evaluateClassic();
+      else evaluateAndRender(false);
     });
     if (rulesList) rulesList.addEventListener('input', function (e) {
       var t = e.target;
@@ -436,17 +589,39 @@
       var ruleId = t.getAttribute('data-rule-id');
       if (!ruleId) return;
       window.State.setPersonalAnswer(ruleId, t.value);
-      evaluateAndRender(false);
+      if (window.State.getMode() === 'classic') evaluateClassic();
+      else evaluateAndRender(false);
     });
 
-    if (window.State.isFinalComplete()) {
-      showFinalEnding();
-    } else if (window.State.getCompletedLevels().indexOf(10) !== -1) {
-      var ip = window.State.getInProgress();
-      if (ip && ip.level === 'final') startFinalWish();
-      else showFinalIntro();
+    var landingEl = document.getElementById('landing');
+    if (landingEl) {
+      landingEl.addEventListener('click', function (e) {
+        var t = e.target;
+        while (t && t !== landingEl && !t.classList.contains('landing-mode') && !t.classList.contains('landing-continue')) {
+          t = t.parentNode;
+        }
+        if (!t || t === landingEl) return;
+        if (t.classList.contains('landing-continue')) {
+          var savedMode = window.State.getMode();
+          if (savedMode === 'classic') initClassicMode();
+          else if (savedMode === 'quick') initQuickMode();
+          return;
+        }
+        var pickedMode = t.getAttribute('data-mode');
+        if (pickedMode !== 'classic' && pickedMode !== 'quick') return;
+        window.State.setMode(pickedMode);
+        if (pickedMode === 'classic') initClassicMode();
+        else initQuickMode();
+      });
+    }
+
+    var savedMode = window.State.getMode();
+    if (savedMode === 'classic') {
+      initClassicMode();
+    } else if (savedMode === 'quick') {
+      initQuickMode();
     } else {
-      startLevel(window.State.getCurrentLevel());
+      window.UI.showLanding({});
     }
   }
 

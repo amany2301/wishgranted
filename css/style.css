@@ -730,6 +730,139 @@ body.final-mode .action-btn.primary:hover { background: var(--blood-soft); borde
 
 ::selection { background: var(--blood); color: var(--paper); }
 
+.landing {
+  padding: 30px 8px 60px;
+  text-align: center;
+}
+
+.landing-privacy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--ink-faded);
+  margin-bottom: 36px;
+}
+
+.landing-title {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 56px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.landing-subtitle {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-bottom: 40px;
+}
+
+.landing-continue {
+  display: block;
+  width: 100%;
+  margin: 0 auto 24px;
+  padding: 14px 16px;
+  background: rgba(139, 105, 20, 0.08);
+  border: 1px solid var(--gold-soft);
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.landing-continue:hover { background: rgba(139, 105, 20, 0.16); }
+.landing-continue strong {
+  display: block;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blood);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.landing-continue em {
+  display: block;
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: 0;
+  margin: 4px 0;
+}
+
+.landing-modes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.landing-mode {
+  position: relative;
+  padding: 24px 20px;
+  background: rgba(255, 248, 230, 0.6);
+  border: 1px solid var(--ink-soft);
+  border-radius: 2px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+  font-family: inherit;
+  color: inherit;
+}
+.landing-mode:hover { background: rgba(255, 248, 230, 0.95); border-color: var(--blood); }
+.landing-mode:active { transform: scale(0.99); }
+
+.landing-mode-classic { border-color: var(--blood); background: rgba(139, 26, 26, 0.05); }
+.landing-mode-classic:hover { background: rgba(139, 26, 26, 0.1); }
+
+.landing-mode-badge {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  padding: 3px 8px;
+  background: var(--blood);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  border-radius: 2px;
+}
+
+.landing-mode-title {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.landing-mode-desc {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faded);
+  line-height: 1.6;
+}
+
+.mode-pill {
+  display: inline-block;
+  padding: 2px 7px;
+  margin-left: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+body.final-mode .mode-pill { background: var(--blood); }
+
 .footer {
   text-align: center;
   margin: 32px auto 0;

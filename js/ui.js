@@ -23,7 +23,81 @@
     els.rulesSectionLabel = $('rules-section-label');
     els.toast = $('toast');
     els.hintHelp = $('hint-help');
+    els.landing = $('landing');
+    els.landingContinue = $('landing-continue');
+    els.topbar = $('topbar');
+    els.header = document.querySelector('.header');
+    els.footer = document.querySelector('.footer');
     els.bound = true;
+  }
+
+  function showLanding(opts) {
+    bindEls();
+    els.body.classList.remove('final-mode');
+    if (els.game) els.game.style.display = 'none';
+    if (els.victory) els.victory.style.display = 'none';
+    if (els.topbar) els.topbar.style.display = 'none';
+    if (els.header) els.header.style.display = 'none';
+    if (els.footer) els.footer.style.display = 'none';
+    if (els.landing) els.landing.style.display = 'block';
+
+    var cont = els.landingContinue;
+    if (cont) {
+      if (opts && opts.continueLabel) {
+        cont.innerHTML = '<strong>Continue</strong>' + escapeHtml(opts.continueLabel);
+        cont.style.display = 'block';
+      } else {
+        cont.innerHTML = '';
+        cont.style.display = 'none';
+      }
+    }
+  }
+
+  function hideLanding() {
+    bindEls();
+    if (els.landing) els.landing.style.display = 'none';
+    if (els.topbar) els.topbar.style.display = 'flex';
+    if (els.header) els.header.style.display = 'block';
+    if (els.footer) els.footer.style.display = 'block';
+  }
+
+  function showClassicShareCard(opts) {
+    bindEls();
+    els.body.classList.remove('final-mode');
+    els.game.style.display = 'none';
+    els.victory.style.display = 'block';
+    els.topbar.style.display = 'flex';
+    els.header.style.display = 'block';
+
+    var wish = opts.wish || '';
+    var ruleCount = opts.ruleCount || 30;
+
+    els.victory.innerHTML =
+      '<div class="victory-screen">' +
+        '<div class="final-intro-eyebrow">Granted</div>' +
+        '<div class="victory-title">Your wish.</div>' +
+        '<div class="victory-sub">10 levels · ' + ruleCount + ' rules · 1 wish</div>' +
+        '<div class="victory-wish" style="font-family: \'IM Fell English\', serif; font-style: italic; font-size: 18px; line-height: 1.55;">' + escapeHtml(wish) + '</div>' +
+        '<div class="victory-genie">"Granted, but with consequences."</div>' +
+        '<div class="action-buttons">' +
+          '<button class="action-btn primary" data-action="copy">Copy</button>' +
+          '<button class="action-btn" data-action="share">Share</button>' +
+          '<button class="action-btn" data-action="reset">Play again</button>' +
+        '</div>' +
+        '<div style="margin-top: 16px; font-family: \'JetBrains Mono\', monospace; font-size: 10px; color: var(--ink-faded); letter-spacing: 0.15em;">wishgranted.vizleo.com</div>' +
+      '</div>';
+
+    var btns = els.victory.querySelectorAll('[data-action]');
+    for (var i = 0; i < btns.length; i++) {
+      (function (btn) {
+        btn.addEventListener('click', function () {
+          var action = btn.getAttribute('data-action');
+          if (action === 'copy' && typeof opts.onCopy === 'function') opts.onCopy();
+          else if (action === 'share' && typeof opts.onShare === 'function') opts.onShare();
+          else if (action === 'reset' && typeof opts.onReset === 'function') opts.onReset();
+        });
+      })(btns[i]);
+    }
   }
 
   function escapeHtml(s) {
@@ -387,6 +461,9 @@
     showFinalIntro: showFinalIntro,
     showFinalEnding: showFinalEnding,
     showToast: showToast,
+    showLanding: showLanding,
+    hideLanding: hideLanding,
+    showClassicShareCard: showClassicShareCard,
     formatTime: formatTime
   };
 })();

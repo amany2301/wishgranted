@@ -8,6 +8,7 @@
   function freshState() {
     return {
       schemaVersion: 1,
+      mode: null,
       currentLevel: 1,
       completedLevels: [],
       inProgress: null,
@@ -16,7 +17,10 @@
       totalKeystrokes: 0,
       firstVisitAt: Date.now(),
       revealedHints: {},
-      personalAnswers: {}
+      personalAnswers: {},
+      classicWish: '',
+      classicLevel: 1,
+      classicCompleted: false
     };
   }
 
@@ -31,8 +35,10 @@
     if (!parsed || typeof parsed !== 'object') return freshState();
 
     var fresh = freshState();
+    var validMode = (parsed.mode === 'classic' || parsed.mode === 'quick') ? parsed.mode : null;
     return {
       schemaVersion: 1,
+      mode: validMode,
       currentLevel: typeof parsed.currentLevel === 'number' ? parsed.currentLevel : fresh.currentLevel,
       completedLevels: Array.isArray(parsed.completedLevels) ? parsed.completedLevels.slice() : [],
       inProgress: (parsed.inProgress && typeof parsed.inProgress === 'object') ? parsed.inProgress : null,
@@ -41,7 +47,10 @@
       totalKeystrokes: typeof parsed.totalKeystrokes === 'number' ? parsed.totalKeystrokes : 0,
       firstVisitAt: typeof parsed.firstVisitAt === 'number' ? parsed.firstVisitAt : fresh.firstVisitAt,
       revealedHints: (parsed.revealedHints && typeof parsed.revealedHints === 'object') ? Object.assign({}, parsed.revealedHints) : {},
-      personalAnswers: (parsed.personalAnswers && typeof parsed.personalAnswers === 'object') ? Object.assign({}, parsed.personalAnswers) : {}
+      personalAnswers: (parsed.personalAnswers && typeof parsed.personalAnswers === 'object') ? Object.assign({}, parsed.personalAnswers) : {},
+      classicWish: typeof parsed.classicWish === 'string' ? parsed.classicWish : '',
+      classicLevel: typeof parsed.classicLevel === 'number' ? parsed.classicLevel : 1,
+      classicCompleted: parsed.classicCompleted === true
     };
   }
 
@@ -181,6 +190,47 @@
     persist();
   }
 
+  function getMode() { return ensure().mode; }
+  function setMode(mode) {
+    var s = ensure();
+    s.mode = (mode === 'classic' || mode === 'quick') ? mode : null;
+    persist();
+  }
+  function clearMode() {
+    var s = ensure();
+    s.mode = null;
+    persist();
+  }
+
+  function getClassicWish() { return ensure().classicWish || ''; }
+  function setClassicWish(w) {
+    var s = ensure();
+    s.classicWish = String(w || '');
+    persist();
+  }
+
+  function getClassicLevelNum() { return ensure().classicLevel || 1; }
+  function setClassicLevelNum(n) {
+    var s = ensure();
+    s.classicLevel = Math.max(1, Math.min(10, n));
+    persist();
+  }
+
+  function isClassicCompleted() { return ensure().classicCompleted === true; }
+  function markClassicComplete() {
+    var s = ensure();
+    s.classicCompleted = true;
+    persist();
+  }
+
+  function resetClassic() {
+    var s = ensure();
+    s.classicWish = '';
+    s.classicLevel = 1;
+    s.classicCompleted = false;
+    persist();
+  }
+
   window.State = {
     load: load,
     save: save,
@@ -204,6 +254,16 @@
     getPersonalAnswers: getPersonalAnswers,
     getPersonalAnswer: getPersonalAnswer,
     setPersonalAnswer: setPersonalAnswer,
+    getMode: getMode,
+    setMode: setMode,
+    clearMode: clearMode,
+    getClassicWish: getClassicWish,
+    setClassicWish: setClassicWish,
+    getClassicLevelNum: getClassicLevelNum,
+    setClassicLevelNum: setClassicLevelNum,
+    isClassicCompleted: isClassicCompleted,
+    markClassicComplete: markClassicComplete,
+    resetClassic: resetClassic,
     HINT_BUDGET: HINT_BUDGET
   };
 })();

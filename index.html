@@ -37,12 +37,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=7">
+<link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 
 <main>
-  <div class="topbar">
+  <div id="landing" class="landing" style="display: none;">
+    <div class="landing-privacy">🔒 Nothing you type leaves your browser.</div>
+    <div class="landing-title">Wishgranted</div>
+    <div class="landing-subtitle">A genie waits. He is impossible to please.</div>
+    <div id="landing-continue" class="landing-continue" style="display: none;"></div>
+    <div class="landing-modes">
+      <button type="button" class="landing-mode landing-mode-classic" data-mode="classic">
+        <div class="landing-mode-badge">RECOMMENDED</div>
+        <div class="landing-mode-title">Classic Mode</div>
+        <div class="landing-mode-desc">One wish. Ten levels. Thirty rules.<br>Your sentence grows until the genie is satisfied.</div>
+      </button>
+      <button type="button" class="landing-mode landing-mode-quick" data-mode="quick">
+        <div class="landing-mode-title">Quick Mode</div>
+        <div class="landing-mode-desc">Ten levels. A fresh wish each level.<br>Plus a 27-rule final wish at the end.</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="topbar" id="topbar">
     <div class="level-num" id="level-num">No. 001</div>
     <div class="level-progress" id="level-progress">— / 10</div>
   </div>
@@ -82,11 +100,11 @@
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<script src="js/rules.js?v=7"></script>
-<script src="js/levels.js?v=7"></script>
-<script src="js/genie.js?v=7"></script>
-<script src="js/state.js?v=7"></script>
-<script src="js/ui.js?v=7"></script>
-<script src="js/app.js?v=7"></script>
+<script src="js/rules.js?v=8"></script>
+<script src="js/levels.js?v=8"></script>
+<script src="js/genie.js?v=8"></script>
+<script src="js/state.js?v=8"></script>
+<script src="js/ui.js?v=8"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

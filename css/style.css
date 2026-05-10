@@ -868,21 +868,34 @@ body.final-mode .action-btn.primary:hover { background: var(--blood-soft); borde
 body.final-mode .mode-pill { background: var(--blood); }
 
 .settings-btn {
-  background: none;
-  border: 1px solid transparent;
-  color: var(--ink-faded);
-  font-size: 18px;
+  background: rgba(74, 63, 53, 0.06);
+  border: 1px solid var(--ink-faded);
+  color: var(--ink);
+  font-size: 22px;
   line-height: 1;
   cursor: pointer;
-  padding: 2px 8px;
-  border-radius: 2px;
+  padding: 6px 14px;
+  min-width: 44px;
+  min-height: 36px;
+  border-radius: 4px;
   font-family: 'JetBrains Mono', monospace;
-  transition: background 0.15s ease, color 0.15s ease;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.settings-btn:hover { color: var(--ink); background: rgba(74, 63, 53, 0.08); }
-.settings-btn[aria-expanded="true"] { color: var(--ink); background: rgba(74, 63, 53, 0.12); }
-body.final-mode .settings-btn { color: var(--blood-soft); }
-body.final-mode .settings-btn:hover { color: var(--paper); background: rgba(139, 26, 26, 0.25); }
+.settings-btn:hover { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.settings-btn[aria-expanded="true"] { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+body.final-mode .settings-btn {
+  background: rgba(244, 235, 217, 0.08);
+  border-color: var(--blood-soft);
+  color: var(--paper);
+}
+body.final-mode .settings-btn:hover,
+body.final-mode .settings-btn[aria-expanded="true"] {
+  background: var(--blood);
+  border-color: var(--blood);
+  color: var(--paper);
+}
 
 .settings-menu {
   position: absolute;

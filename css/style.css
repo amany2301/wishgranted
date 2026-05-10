@@ -422,6 +422,14 @@ body.final-mode .hint-help.depleted {
   transition: all 0.2s ease;
   border-radius: 2px;
   min-height: 44px;
+  position: sticky;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 5;
+  box-shadow: 0 -8px 24px -8px rgba(60, 40, 25, 0.25);
+}
+
+body.final-mode .grant-btn {
+  box-shadow: 0 -8px 24px -8px rgba(0, 0, 0, 0.5);
 }
 
 body.final-mode .grant-btn {

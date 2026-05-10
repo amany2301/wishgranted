@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wishgranted",
+  "compatibility_date": "2026-05-10",
+  "assets": {
+    "directory": "./"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

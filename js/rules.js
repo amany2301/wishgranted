@@ -47,6 +47,20 @@
     return ws[ws.length - 1];
   }
 
+  function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function checkPersonal(w, ctx) {
+    var ans = ((ctx && ctx.personalAnswer) || '').trim();
+    if (!ans) return false;
+    try {
+      return new RegExp('\\b' + escapeRegex(ans) + '\\b', 'i').test(w);
+    } catch (e) {
+      return w.toLowerCase().indexOf(ans.toLowerCase()) !== -1;
+    }
+  }
+
   var RULE_POOL = [
     {
       id: 'len12',
@@ -633,10 +647,12 @@
     {
       id: 'exLastName',
       text: "Your wish must contain the last name of your ex.",
-      hint: "Or type 'lucky' to skip — the genie envies you. The genie remembers them. Surname only.",
-      check: function (w) { return /\blucky\b/i.test(w); },
+      hint: "Type their surname (or any word) below — then add the same word to your wish. The genie won't verify.",
+      check: checkPersonal,
       difficulty: 2,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "their surname (or any word)",
       reactions: [
         "...we don't speak of them. Try again.",
         "You and I both know that's not their real name.",
@@ -646,10 +662,12 @@
     {
       id: 'crushFirstName',
       text: "Your wish must contain your current crush's first name.",
-      hint: "Or type 'nobody' to skip — the genie pities you. Just the first name. The genie won't tell.",
-      check: function (w) { return /\bnobody\b/i.test(w); },
+      hint: "Type their first name (or any word) below — then add the same word to your wish. The genie won't tell.",
+      check: checkPersonal,
       difficulty: 2,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "their first name (or any word)",
       reactions: [
         "Don't be shy.",
         "This wish reeks of unresolved feelings.",
@@ -659,10 +677,12 @@
     {
       id: 'googled2am',
       text: "Your wish must contain something you Googled at 2 AM.",
-      hint: "Or type 'sleep' to skip — the genie approves. Anything. Even the embarrassing one.",
-      check: function (w) { return /\bsleep\b/i.test(w); },
+      hint: "Type whatever it was (or any word) below — then add it to your wish. Even the embarrassing one.",
+      check: checkPersonal,
       difficulty: 3,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "your 2 AM search (or any word)",
       reactions: [
         "Bold of you. Bolder still to lie about it.",
         "The genie was watching at 2 AM too.",
@@ -672,10 +692,12 @@
     {
       id: 'pickupLine',
       text: "Your wish must contain your most-used pickup line.",
-      hint: "Or type 'hopeless' to skip — the genie consoles you. Quote yourself. Verbatim.",
-      check: function (w) { return /\bhopeless\b/i.test(w); },
+      hint: "Type one word from the line (or any word) below — then add it to your wish. Quote yourself.",
+      check: checkPersonal,
       difficulty: 3,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "a word from your line",
       reactions: [
         "The genie averts his gaze.",
         "Surely there's worse. Confess.",
@@ -685,10 +707,12 @@
     {
       id: 'friendSecret',
       text: "Your wish must contain a friend's name AND one of their secrets.",
-      hint: "Or type 'loyalty' to skip — the genie respects you. Name first. Secret after. The genie keeps it.",
-      check: function (w) { return /\bloyalty\b/i.test(w); },
+      hint: "Type a word that captures it (or any word) below — then add it to your wish. The genie keeps it.",
+      check: checkPersonal,
       difficulty: 4,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "the secret (or any word)",
       reactions: [
         "Bolder. The genie wants names.",
         "Loyalty is for mortals. Spill.",
@@ -698,10 +722,12 @@
     {
       id: 'instaStalk',
       text: "Your wish must contain the name of someone you've stalked on Instagram in the last 24 hours.",
-      hint: "Or type 'innocent' to skip — the genie doubts you. First name is enough. The genie sees all profiles.",
-      check: function (w) { return /\binnocent\b/i.test(w); },
+      hint: "Type their first name (or any word) below — then add it to your wish. The genie sees all profiles.",
+      check: checkPersonal,
       difficulty: 4,
       category: 'personal',
+      isPersonal: true,
+      promptPlaceholder: "their first name (or any word)",
       reactions: [
         "The genie averts his gaze.",
         "Mortal, you disappoint me.",

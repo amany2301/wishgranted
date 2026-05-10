@@ -84,9 +84,26 @@
     return out;
   }
 
+  // Personal-rule answers used by the solvability seeds. The seed wishes
+  // already include these words, so we pre-pretend the player committed
+  // them as the personal answer for each rule.
+  var PERSONAL_ANSWERS = {
+    exLastName: 'lucky',
+    crushFirstName: 'nobody',
+    googled2am: 'sleep',
+    pickupLine: 'hopeless',
+    friendSecret: 'loyalty',
+    instaStalk: 'innocent'
+  };
+
+  function ctxFor(rule) {
+    if (rule.isPersonal) return { personalAnswer: PERSONAL_ANSWERS[rule.id] || '' };
+    return undefined;
+  }
+
   function passesAll(rules, wish) {
     for (var i = 0; i < rules.length; i++) {
-      if (!rules[i].check(wish)) return false;
+      if (!rules[i].check(wish, ctxFor(rules[i]))) return false;
     }
     return true;
   }
@@ -94,7 +111,7 @@
   function failingIds(rules, wish) {
     var out = [];
     for (var i = 0; i < rules.length; i++) {
-      if (!rules[i].check(wish)) out.push(rules[i].id);
+      if (!rules[i].check(wish, ctxFor(rules[i]))) out.push(rules[i].id);
     }
     return out;
   }
@@ -138,7 +155,7 @@
         if (passesAll(rules, wish)) return { ok: true, wish: wish, iters: 0 };
       }
       var passCount = 0;
-      for (var k = 0; k < rules.length; k++) if (rules[k].check(wish)) passCount++;
+      for (var k = 0; k < rules.length; k++) if (rules[k].check(wish, ctxFor(rules[k]))) passCount++;
       if (passCount > bestScore) { bestScore = passCount; bestWish = wish; }
     }
 
@@ -158,7 +175,7 @@
         if (passesAll(rules, candidate)) return { ok: true, wish: candidate, iters: iters };
       }
       var score = 0;
-      for (var k2 = 0; k2 < rules.length; k2++) if (rules[k2].check(candidate)) score++;
+      for (var k2 = 0; k2 < rules.length; k2++) if (rules[k2].check(candidate, ctxFor(rules[k2]))) score++;
       if (score > currentScore || (score === currentScore && Math.random() < 0.05)) {
         current = candidate;
         currentScore = score;

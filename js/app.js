@@ -38,12 +38,14 @@
 
     var visible = rules.slice(0, unlockedCount);
     var wish = window.UI.getWishValue();
+    var personalAnswers = window.State.getPersonalAnswers();
     var passedCount = 0;
     var broken = [];
 
     for (var i = 0; i < visible.length; i++) {
       var rule = visible[i];
-      var passed = rule.check(wish);
+      var ctx = rule.isPersonal ? { personalAnswer: personalAnswers[rule.id] || '' } : undefined;
+      var passed = rule.check(wish, ctx);
       if (passed) {
         passedCount++;
         if (!recentlyPassedIds[rule.id] && wish.length > 0) {
@@ -58,7 +60,7 @@
     }
 
     var revealed = window.State.getRevealedHints();
-    window.UI.renderRules(visible, wish, broken, revealed);
+    window.UI.renderRules(visible, wish, broken, revealed, personalAnswers);
     window.UI.setMeta({
       chars: wish.length,
       passed: passedCount,
@@ -112,7 +114,9 @@
       var failingRule = null;
       var failingCount = 0;
       for (var j = 0; j < visible.length; j++) {
-        if (!visible[j].check(wish)) { failingRule = visible[j]; failingCount++; }
+        var jr = visible[j];
+        var jctx = jr.isPersonal ? { personalAnswer: personalAnswers[jr.id] || '' } : undefined;
+        if (!jr.check(wish, jctx)) { failingRule = jr; failingCount++; }
       }
       if (failingCount === 1 && failingRule &&
           (failingRule.id === 'doubleLetter' || failingRule.id === 'noDouble')) {
@@ -424,6 +428,14 @@
         window.UI.showToast('No hints left');
         return;
       }
+      evaluateAndRender(false);
+    });
+    if (rulesList) rulesList.addEventListener('input', function (e) {
+      var t = e.target;
+      if (!t || !t.classList || !t.classList.contains('rule-personal-input')) return;
+      var ruleId = t.getAttribute('data-rule-id');
+      if (!ruleId) return;
+      window.State.setPersonalAnswer(ruleId, t.value);
       evaluateAndRender(false);
     });
 

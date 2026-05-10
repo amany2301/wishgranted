@@ -351,6 +351,39 @@ body.final-mode .rule-hint { color: var(--blood-soft); }
 .rule.failed .rule-hint { color: var(--blood); }
 body.final-mode .rule.failed .rule-hint { color: #FF8888; }
 
+.rule-personal-input {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 248, 230, 0.7);
+  border: 1px solid var(--ink-soft);
+  border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.rule-personal-input:focus {
+  border-color: var(--blood);
+  background: rgba(255, 248, 230, 0.95);
+}
+.rule-personal-input::placeholder {
+  color: var(--ink-faded);
+  font-style: italic;
+}
+body.final-mode .rule-personal-input {
+  background: rgba(20, 10, 10, 0.65);
+  border-color: var(--blood);
+  color: var(--paper);
+}
+body.final-mode .rule-personal-input:focus {
+  background: rgba(20, 10, 10, 0.9);
+  border-color: var(--blood-soft);
+}
+body.final-mode .rule-personal-input::placeholder { color: var(--blood-soft); opacity: 0.6; }
+
 .rule-hint-btn {
   margin-top: 6px;
   padding: 2px 0;

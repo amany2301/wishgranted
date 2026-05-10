@@ -15,7 +15,8 @@
       finalData: null,
       totalKeystrokes: 0,
       firstVisitAt: Date.now(),
-      revealedHints: {}
+      revealedHints: {},
+      personalAnswers: {}
     };
   }
 
@@ -39,7 +40,8 @@
       finalData: parsed.finalData || null,
       totalKeystrokes: typeof parsed.totalKeystrokes === 'number' ? parsed.totalKeystrokes : 0,
       firstVisitAt: typeof parsed.firstVisitAt === 'number' ? parsed.firstVisitAt : fresh.firstVisitAt,
-      revealedHints: (parsed.revealedHints && typeof parsed.revealedHints === 'object') ? Object.assign({}, parsed.revealedHints) : {}
+      revealedHints: (parsed.revealedHints && typeof parsed.revealedHints === 'object') ? Object.assign({}, parsed.revealedHints) : {},
+      personalAnswers: (parsed.personalAnswers && typeof parsed.personalAnswers === 'object') ? Object.assign({}, parsed.personalAnswers) : {}
     };
   }
 
@@ -160,6 +162,25 @@
     return true;
   }
 
+  function getPersonalAnswers() {
+    var s = ensure();
+    if (!s.personalAnswers) s.personalAnswers = {};
+    return Object.assign({}, s.personalAnswers);
+  }
+
+  function getPersonalAnswer(ruleId) {
+    var s = ensure();
+    if (!s.personalAnswers) s.personalAnswers = {};
+    return s.personalAnswers[ruleId] || '';
+  }
+
+  function setPersonalAnswer(ruleId, value) {
+    var s = ensure();
+    if (!s.personalAnswers) s.personalAnswers = {};
+    s.personalAnswers[ruleId] = String(value || '');
+    persist();
+  }
+
   window.State = {
     load: load,
     save: save,
@@ -180,6 +201,9 @@
     isHintRevealed: isHintRevealed,
     getHintsRemaining: getHintsRemaining,
     revealHint: revealHint,
+    getPersonalAnswers: getPersonalAnswers,
+    getPersonalAnswer: getPersonalAnswer,
+    setPersonalAnswer: setPersonalAnswer,
     HINT_BUDGET: HINT_BUDGET
   };
 })();

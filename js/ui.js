@@ -110,16 +110,41 @@
     els.grantBtn.textContent = opts.text;
   }
 
-  function renderRules(visibleRules, wish, brokenIds, revealedHints) {
+  function renderRules(visibleRules, wish, brokenIds, revealedHints, personalAnswers) {
     bindEls();
     brokenIds = brokenIds || [];
     revealedHints = revealedHints || {};
+    personalAnswers = personalAnswers || {};
+
+    // Preserve focus + caret on a personal-answer input across innerHTML rewrite
+    var active = document.activeElement;
+    var focusedRuleId = null;
+    var caret = 0;
+    if (active && active.classList && active.classList.contains('rule-personal-input')) {
+      focusedRuleId = active.getAttribute('data-rule-id');
+      try { caret = active.selectionStart; } catch (e) { caret = (active.value || '').length; }
+    }
+
     var html = '';
     for (var i = 0; i < visibleRules.length; i++) {
       var rule = visibleRules[i];
-      var passed = rule.check(wish);
+      var ctx = rule.isPersonal
+        ? { personalAnswer: personalAnswers[rule.id] || '' }
+        : undefined;
+      var passed = rule.check(wish, ctx);
       var cls = passed ? 'passed' : (wish.length > 0 ? 'failed' : '');
       var broken = brokenIds.indexOf(rule.id) !== -1 ? ' just-broken' : '';
+
+      var personalInputHtml = '';
+      if (rule.isPersonal) {
+        var ans = personalAnswers[rule.id] || '';
+        var placeholder = rule.promptPlaceholder || 'type your answer';
+        personalInputHtml =
+          '<input type="text" class="rule-personal-input" data-rule-id="' + escapeHtml(rule.id) + '" ' +
+            'value="' + escapeHtml(ans) + '" placeholder="' + escapeHtml(placeholder) + '" ' +
+            'autocomplete="off" autocapitalize="off" spellcheck="false" autocorrect="off">';
+      }
+
       var hintBlockHtml = '';
       if (!passed && wish.length > 0) {
         if (revealedHints[rule.id]) {
@@ -129,16 +154,26 @@
           hintBlockHtml = '<button type="button" class="rule-hint-btn" data-rule-id="' + escapeHtml(rule.id) + '">— reveal hint —</button>';
         }
       }
+
       html +=
         '<div class="rule ' + cls + broken + '" data-id="' + escapeHtml(rule.id) + '">' +
           '<div class="rule-num">No. ' + String(i + 1).padStart(2, '0') + '</div>' +
           '<div class="rule-content">' +
             '<div class="rule-text">' + escapeHtml(rule.text) + '</div>' +
+            personalInputHtml +
             hintBlockHtml +
           '</div>' +
         '</div>';
     }
     els.rulesList.innerHTML = html;
+
+    if (focusedRuleId) {
+      var newInput = els.rulesList.querySelector('.rule-personal-input[data-rule-id="' + focusedRuleId + '"]');
+      if (newInput) {
+        newInput.focus();
+        try { newInput.setSelectionRange(caret, caret); } catch (e) { /* ignore */ }
+      }
+    }
   }
 
   function showGenieLine(text) {

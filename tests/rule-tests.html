@@ -243,26 +243,32 @@
       fail: ['1 1 1', '2 2', 'no digits']
     },
     exLastName: {
+      ctx: { personalAnswer: 'lucky' },
       pass: ['I am lucky', 'lucky day', 'so lucky here'],
       fail: ['no fallback', 'just words', 'plain wish']
     },
     crushFirstName: {
+      ctx: { personalAnswer: 'nobody' },
       pass: ['nobody knows', 'I have nobody', 'just nobody'],
       fail: ['somebody', 'just words', 'plain wish']
     },
     googled2am: {
+      ctx: { personalAnswer: 'sleep' },
       pass: ['need sleep', 'sleep more', 'I sleep tight'],
       fail: ['awake', 'just words', 'plain wish']
     },
     pickupLine: {
+      ctx: { personalAnswer: 'hopeless' },
       pass: ['I am hopeless', 'hopeless romantic', 'truly hopeless'],
       fail: ['hopeful', 'just words', 'plain wish']
     },
     friendSecret: {
+      ctx: { personalAnswer: 'loyalty' },
       pass: ['loyalty matters', 'I value loyalty', 'pure loyalty'],
       fail: ['betrayal', 'just words', 'plain wish']
     },
     instaStalk: {
+      ctx: { personalAnswer: 'innocent' },
       pass: ['I am innocent', 'so innocent', 'truly innocent'],
       fail: ['guilty', 'just words', 'plain wish']
     }
@@ -291,13 +297,13 @@
 
       for (var p = 0; p < spec.pass.length; p++) {
         totalCases++;
-        var got = rule.check(spec.pass[p]);
+        var got = rule.check(spec.pass[p], spec.ctx);
         if (!got) failedCases++;
         passResults.push({ wish: spec.pass[p], got: got, expected: true });
       }
       for (var f = 0; f < spec.fail.length; f++) {
         totalCases++;
-        var got2 = rule.check(spec.fail[f]);
+        var got2 = rule.check(spec.fail[f], spec.ctx);
         if (got2) failedCases++;
         failResults.push({ wish: spec.fail[f], got: got2, expected: false });
       }

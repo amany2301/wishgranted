@@ -55,8 +55,7 @@
 
   var lastPicked = {};
 
-  function pickGenieLine(category) {
-    var pool = GENIE_LINES[category];
+  function pickFromPool(key, pool) {
     if (!pool || !pool.length) return '';
     if (pool.length === 1) return pool[0];
     var idx, line;
@@ -65,12 +64,17 @@
       idx = Math.floor(Math.random() * pool.length);
       line = pool[idx];
       attempts++;
-    } while (line === lastPicked[category] && attempts < 8);
-    lastPicked[category] = line;
+    } while (line === lastPicked[key] && attempts < 8);
+    lastPicked[key] = line;
     return line;
+  }
+
+  function pickGenieLine(category) {
+    return pickFromPool(category, GENIE_LINES[category]);
   }
 
   window.GENIE_LINES = Object.freeze(GENIE_LINES);
   window.pickGenieLine = pickGenieLine;
+  window.pickFromPool = pickFromPool;
   window.GENIE_CONTRADICTION_LINE = "You found the impossibility. The genie acknowledges. Granted.";
 })();

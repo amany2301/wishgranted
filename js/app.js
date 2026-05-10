@@ -68,7 +68,18 @@
     });
 
     if (broken.length > 0 && !isInitial) {
-      window.UI.showGenieLine(window.pickGenieLine('onBreak'));
+      var firstBrokenId = broken[0];
+      var brokenRule = null;
+      for (var bi = 0; bi < visible.length; bi++) {
+        if (visible[bi].id === firstBrokenId) { brokenRule = visible[bi]; break; }
+      }
+      var line;
+      if (brokenRule && brokenRule.reactions && brokenRule.reactions.length) {
+        line = window.pickFromPool('rule:' + brokenRule.id, brokenRule.reactions);
+      } else {
+        line = window.pickGenieLine('onBreak');
+      }
+      window.UI.showGenieLine(line);
     }
 
     if (mode === 'final') {

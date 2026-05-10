@@ -629,6 +629,84 @@
       },
       difficulty: 2,
       category: 'content'
+    },
+    {
+      id: 'exLastName',
+      text: "Your wish must contain the last name of your ex.",
+      hint: "Or type 'lucky' to skip — the genie envies you. The genie remembers them. Surname only.",
+      check: function (w) { return /\blucky\b/i.test(w); },
+      difficulty: 2,
+      category: 'personal',
+      reactions: [
+        "...we don't speak of them. Try again.",
+        "You and I both know that's not their real name.",
+        "The genie remembers them, even if you'd rather not."
+      ]
+    },
+    {
+      id: 'crushFirstName',
+      text: "Your wish must contain your current crush's first name.",
+      hint: "Or type 'nobody' to skip — the genie pities you. Just the first name. The genie won't tell.",
+      check: function (w) { return /\bnobody\b/i.test(w); },
+      difficulty: 2,
+      category: 'personal',
+      reactions: [
+        "Don't be shy.",
+        "This wish reeks of unresolved feelings.",
+        "The genie sees the way you type their name."
+      ]
+    },
+    {
+      id: 'googled2am',
+      text: "Your wish must contain something you Googled at 2 AM.",
+      hint: "Or type 'sleep' to skip — the genie approves. Anything. Even the embarrassing one.",
+      check: function (w) { return /\bsleep\b/i.test(w); },
+      difficulty: 3,
+      category: 'personal',
+      reactions: [
+        "Bold of you. Bolder still to lie about it.",
+        "The genie was watching at 2 AM too.",
+        "Mortal, you disappoint me."
+      ]
+    },
+    {
+      id: 'pickupLine',
+      text: "Your wish must contain your most-used pickup line.",
+      hint: "Or type 'hopeless' to skip — the genie consoles you. Quote yourself. Verbatim.",
+      check: function (w) { return /\bhopeless\b/i.test(w); },
+      difficulty: 3,
+      category: 'personal',
+      reactions: [
+        "The genie averts his gaze.",
+        "Surely there's worse. Confess.",
+        "The genie has heard worse. Maybe."
+      ]
+    },
+    {
+      id: 'friendSecret',
+      text: "Your wish must contain a friend's name AND one of their secrets.",
+      hint: "Or type 'loyalty' to skip — the genie respects you. Name first. Secret after. The genie keeps it.",
+      check: function (w) { return /\bloyalty\b/i.test(w); },
+      difficulty: 4,
+      category: 'personal',
+      reactions: [
+        "Bolder. The genie wants names.",
+        "Loyalty is for mortals. Spill.",
+        "The genie sighs the sigh of a thousand years."
+      ]
+    },
+    {
+      id: 'instaStalk',
+      text: "Your wish must contain the name of someone you've stalked on Instagram in the last 24 hours.",
+      hint: "Or type 'innocent' to skip — the genie doubts you. First name is enough. The genie sees all profiles.",
+      check: function (w) { return /\binnocent\b/i.test(w); },
+      difficulty: 4,
+      category: 'personal',
+      reactions: [
+        "The genie averts his gaze.",
+        "Mortal, you disappoint me.",
+        "The genie sees your screen time too."
+      ]
     }
   ];
 

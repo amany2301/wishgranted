@@ -304,6 +304,7 @@
         '</div>' +
         '<div class="action-buttons">' +
           '<button class="action-btn final" data-action="share">Share the final wish</button>' +
+          '<button class="action-btn" data-action="reset">Begin again</button>' +
         '</div>' +
         '<div style="margin-top: 24px; font-family: \'IM Fell English\', serif; font-style: italic; font-size: 14px; color: rgba(244, 235, 217, 0.6); line-height: 1.6;">' +
           'You have outlasted the genie. The page is quiet now.' +
@@ -316,6 +317,12 @@
     if (shareBtn) {
       shareBtn.addEventListener('click', function () {
         if (typeof opts.onShare === 'function') opts.onShare();
+      });
+    }
+    var resetBtn = els.victory.querySelector('[data-action="reset"]');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (typeof opts.onReset === 'function') opts.onReset();
       });
     }
   }

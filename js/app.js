@@ -250,7 +250,8 @@
       data: data,
       isContradiction: isContradiction,
       genieLine: line,
-      onShare: function () { shareFinal(data); }
+      onShare: function () { shareFinal(data); },
+      onReset: onReset
     });
   }
 

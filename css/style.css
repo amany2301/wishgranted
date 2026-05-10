@@ -669,10 +669,16 @@ body.final-mode .action-btn.primary:hover { background: var(--blood-soft); borde
   font-size: 12px;
   letter-spacing: 0.1em;
   z-index: 100;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
 }
 
-.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
 
 ::selection { background: var(--blood); color: var(--paper); }
 

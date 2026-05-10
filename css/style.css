@@ -34,7 +34,7 @@ body {
     radial-gradient(ellipse at 70% 80%, rgba(139, 26, 26, 0.06) 0%, transparent 60%),
     var(--paper);
   position: relative;
-  padding: 20px 20px 120px;
+  padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(120px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   max-width: 540px;
   margin: 0 auto;
 }
@@ -665,7 +665,7 @@ body.final-mode .action-btn.primary:hover { background: var(--blood-soft); borde
 
 .toast {
   position: fixed;
-  bottom: 30px;
+  bottom: calc(30px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%) translateY(120%);
   background: var(--ink);

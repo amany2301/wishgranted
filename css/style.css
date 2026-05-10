@@ -888,27 +888,30 @@ body.final-mode .settings-btn:hover { color: var(--paper); background: rgba(139,
   position: absolute;
   top: 56px;
   right: 20px;
-  z-index: 50;
+  z-index: 100;
   width: 240px;
-  background: var(--paper-soft);
-  border: 1px solid var(--ink-soft);
-  border-radius: 3px;
-  box-shadow: 0 4px 16px -4px rgba(60, 40, 25, 0.25);
+  background: var(--ink);
+  color: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 0 12px 28px -8px rgba(20, 14, 8, 0.55), 0 2px 6px rgba(20, 14, 8, 0.25);
   overflow: hidden;
 }
 
 body.final-mode .settings-menu {
-  background: #1F1414;
+  background: var(--blood-dark);
+  color: var(--paper);
   border-color: var(--blood);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .settings-item {
   display: block;
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: none;
   border: none;
-  border-bottom: 1px solid rgba(74, 63, 53, 0.1);
+  border-bottom: 1px solid rgba(244, 235, 217, 0.12);
   text-align: left;
   cursor: pointer;
   font-family: inherit;
@@ -916,28 +919,26 @@ body.final-mode .settings-menu {
   transition: background 0.12s ease;
 }
 .settings-item:last-child { border-bottom: none; }
-.settings-item:hover { background: rgba(139, 26, 26, 0.06); }
-body.final-mode .settings-item:hover { background: rgba(139, 26, 26, 0.2); }
+.settings-item:hover { background: rgba(244, 235, 217, 0.08); }
+.settings-item:active { background: rgba(244, 235, 217, 0.14); }
 
 .settings-item-title {
   display: block;
   font-family: 'IM Fell English', serif;
   font-style: italic;
-  font-size: 14px;
-  color: var(--ink);
-  margin-bottom: 2px;
+  font-size: 15px;
+  color: var(--paper);
+  margin-bottom: 3px;
 }
-body.final-mode .settings-item-title { color: var(--paper); }
 
 .settings-item-desc {
   display: block;
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px;
-  letter-spacing: 0.1em;
-  color: var(--ink-faded);
+  letter-spacing: 0.14em;
+  color: rgba(244, 235, 217, 0.55);
   text-transform: uppercase;
 }
-body.final-mode .settings-item-desc { color: var(--blood-soft); opacity: 0.8; }
 
 .footer {
   text-align: center;

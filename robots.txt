@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /tests/
 
 Sitemap: https://wishgranted.vizleo.com/sitemap.xml

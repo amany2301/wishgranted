@@ -974,6 +974,108 @@ body.final-mode .footer-credit { color: var(--blood-soft); opacity: 0.7; }
 
 .title { cursor: default; user-select: none; }
 
+/* ─── About / SEO content section ───────────────────────────────── */
+
+.about {
+  margin: 8px auto 0;
+  padding: 8px 0 24px;
+  max-width: 480px;
+}
+
+.about-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 20px;
+}
+
+.about-divider hr {
+  flex: 1;
+  border: none;
+  border-top: 1px solid var(--ink-faded);
+  opacity: 0.4;
+}
+
+body.final-mode .about-divider hr { border-top-color: var(--blood); }
+
+.about-divider span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+body.final-mode .about-divider span { color: var(--blood-soft); }
+
+.about h2 {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--ink);
+  margin: 28px 0 10px;
+}
+
+.about h3 {
+  font-family: 'IM Fell English', serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 18px 0 6px;
+}
+
+body.final-mode .about h2,
+body.final-mode .about h3 { color: var(--paper); }
+
+.about p {
+  font-family: 'IM Fell English', serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-bottom: 12px;
+}
+
+body.final-mode .about p { color: rgba(244, 235, 217, 0.75); }
+
+.about strong { color: var(--ink); font-weight: 700; }
+body.final-mode .about strong { color: var(--paper); }
+
+.about em { font-style: italic; }
+
+.about-steps {
+  margin: 4px 0 12px;
+  padding-left: 22px;
+}
+
+.about-steps li {
+  font-family: 'IM Fell English', serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin-bottom: 7px;
+}
+
+body.final-mode .about-steps li { color: rgba(244, 235, 217, 0.75); }
+
+.faq {
+  margin-top: 4px;
+}
+
+.faq h3 {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 16px 0 4px;
+}
+
+body.final-mode .faq h3 { color: var(--paper); }
+
+.faq p {
+  margin-bottom: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

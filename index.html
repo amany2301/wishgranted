@@ -104,7 +104,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=12">
+<link rel="stylesheet" href="css/style.css?v=13">
 </head>
 <body>
 
@@ -220,21 +220,41 @@
       <h3>What is the Final Wish in Wishgranted?</h3>
       <p>The Final Wish is the climax of Quick Mode: after clearing all 10 levels you face a single wish that must satisfy 27 conditions at once — including one impossible contradiction the genie expects you to find.</p>
     </div>
+
+    <h2 id="contact">Get in touch</h2>
+    <p>Found a bug, want to suggest a rule, or just say something to the genie? Drop a note.</p>
+    <form class="contact-form" id="contact-form" action="https://formspree.io/f/xykdlvby" method="POST">
+      <label class="contact-label" for="contact-name">Your name</label>
+      <input class="contact-input" type="text" id="contact-name" name="name" autocomplete="name" required>
+
+      <label class="contact-label" for="contact-email">Your email</label>
+      <input class="contact-input" type="email" id="contact-email" name="email" autocomplete="email" required>
+
+      <label class="contact-label" for="contact-message">Message</label>
+      <textarea class="contact-input contact-textarea" id="contact-message" name="message" rows="4" required></textarea>
+
+      <input type="hidden" name="_subject" value="Wishgranted — message from the site">
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true">
+
+      <button class="contact-submit" type="submit" id="contact-submit">Send to the genie</button>
+      <div class="contact-status" id="contact-status" role="status" aria-live="polite"></div>
+      <div class="contact-note">Your message goes to me via Formspree. The game itself never sends anything anywhere.</div>
+    </form>
   </section>
 
   <footer class="footer">
-    <span class="footer-credit">made with care · 2026</span>
+    <span class="footer-credit">made with care · 2026 · <a class="footer-link" href="#contact">contact</a></span>
   </footer>
 </main>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<script src="js/rules.js?v=12"></script>
-<script src="js/levels.js?v=12"></script>
-<script src="js/genie.js?v=12"></script>
-<script src="js/state.js?v=12"></script>
-<script src="js/ui.js?v=12"></script>
-<script src="js/app.js?v=12"></script>
+<script src="js/rules.js?v=13"></script>
+<script src="js/levels.js?v=13"></script>
+<script src="js/genie.js?v=13"></script>
+<script src="js/state.js?v=13"></script>
+<script src="js/ui.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
 
 <!--
   Cloudflare Web Analytics — privacy-friendly, no cookies.

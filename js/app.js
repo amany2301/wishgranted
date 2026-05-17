@@ -656,6 +656,45 @@
       });
     }
 
+    var contactForm = document.getElementById('contact-form');
+    var contactStatus = document.getElementById('contact-status');
+    var contactSubmit = document.getElementById('contact-submit');
+    if (contactForm && contactStatus && contactSubmit) {
+      contactForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (contactForm._gotcha && contactForm._gotcha.value) return; // honeypot tripped
+        contactStatus.className = 'contact-status';
+        contactStatus.textContent = 'Sending…';
+        contactSubmit.disabled = true;
+        var origLabel = contactSubmit.textContent;
+        contactSubmit.textContent = 'Sending…';
+        var data = new FormData(contactForm);
+        fetch(contactForm.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        }).then(function (res) {
+          if (res.ok) {
+            contactForm.reset();
+            contactStatus.className = 'contact-status ok';
+            contactStatus.textContent = 'The genie received your message. Thank you.';
+            contactSubmit.textContent = 'Sent ✓';
+            setTimeout(function () {
+              contactSubmit.disabled = false;
+              contactSubmit.textContent = origLabel;
+            }, 4000);
+          } else {
+            return res.json().then(function (j) { throw new Error((j && j.errors && j.errors[0] && j.errors[0].message) || 'Send failed.'); });
+          }
+        }).catch(function (err) {
+          contactStatus.className = 'contact-status err';
+          contactStatus.textContent = (err && err.message) || 'Could not send. Try again, or email directly.';
+          contactSubmit.disabled = false;
+          contactSubmit.textContent = origLabel;
+        });
+      });
+    }
+
     var savedMode = window.State.getMode();
     if (savedMode === 'classic') {
       initClassicMode();
